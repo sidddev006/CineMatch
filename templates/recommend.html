@@ -1,0 +1,400 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card shadow-sm border-0 mb-4 welcome-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <h1 class="mb-1 fw-bold">Hi {{username}}! 👋</h1>
+                                <p class="text-muted mb-0">Ready to discover your next favorite movie?</p>
+                            </div>
+                            <form action="/watchlist" method="get" class="m-0"><button type="submit" class="btn btn-outline-primary d-flex align-items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bookmark-star" viewBox="0 0 16 16">
+                                <path d="M7.84 4.1a.178.178 0 0 1 .32 0l.634 1.285a.178.178 0 0 0 .134.098l1.42.206c.145.021.203.2.098.303L9.42 6.993a.178.178 0 0 0-.051.158l.242 1.414a.178.178 0 0 1-.258.187l-1.27-.668a.178.178 0 0 0-.165 0l-1.27.668a.178.178 0 0 1-.257-.187l.242-1.414a.178.178 0 0 0-.05-.158l-1.03-1.001a.178.178 0 0 1 .098-.303l1.42-.206a.178.178 0 0 0 .134-.098L7.84 4.1z" />
+                                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z" />
+                            </svg>My Watchlist</button></form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow-sm border-0 main-form-card">
+                    <div class="form-header-graphic"><svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#waveGradient)" fill-opacity="1" d="M0,128L48,138.7C96,149,192,171,288,170.7C384,171,480,149,576,128C672,107,768,85,864,96C960,107,1056,149,1152,160C1248,171,1344,149,1392,138.7L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+                    </svg></div>
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="h4 mb-4 text-center fw-semibold">Find Your Perfect Movie</h2>
+                        <form action="/recommend" method="post">
+                            <div class="form-step-group mb-4">
+                                <div class="step-number">1</div>
+                                <div class="form-content"><label class="form-label fw-semibold d-flex align-items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-film text-primary" viewBox="0 0 16 16">
+                                    <path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm4 0v6h8V1H4zm8 8H4v6h8V9zM1 1v2h2V1H1zm2 3H1v2h2V4zM1 7v2h2V7H1zm2 3H1v2h2v-2zm-2 3v2h2v-2H1zM15 1h-2v2h2V1zm-2 3v2h2V4h-2zm2 3h-2v2h2V7zm-2 3v2h2v-2h-2zm2 3h-2v2h2v-2z" />
+                                </svg>Genre</label>
+                                    <div class="custom-select-wrapper genre-select-wrapper">
+                                        <input type="hidden" name="genre" />
+                                        <div class="custom-select">
+                                            <div class="custom-select__trigger"><span>Choose your preferred genre...</span>
+                                                <div class="arrow"></div>
+                                            </div>
+                                            <div class="custom-options">{% for genre in genres %}<span class="custom-option" data-value="{{ genre.id }}">{{ genre.name }}</span>{% endfor %}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-step-group mb-4">
+                                <div class="step-number">2</div>
+                                <div class="form-content"><label class="form-label fw-semibold d-flex align-items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar3 text-primary" viewBox="0 0 16 16">
+                                    <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z" />
+                                    <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                                </svg>Decade</label>
+                                    <div class="custom-select-wrapper"><input type="hidden" name="decade" />
+                                        <div class="custom-select">
+                                            <div class="custom-select__trigger"><span>Select your favorite era...</span>
+                                                <div class="arrow"></div>
+                                            </div>
+                                            <div class="custom-options"><span class="custom-option" data-value="1990s">1990s</span><span class="custom-option" data-value="2000s">2000s</span><span class="custom-option" data-value="2010s">2010s</span><span class="custom-option" data-value="2020s">2020s</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-step-group mb-4">
+                                <div class="step-number">3</div>
+                                <div class="form-content"><label class="form-label fw-semibold d-flex align-items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-clock text-primary" viewBox="0 0 16 16">
+                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                </svg>Max Runtime</label>
+                                    <div class="custom-select-wrapper"><input type="hidden" name="runtime" />
+                                        <div class="custom-select">
+                                            <div class="custom-select__trigger"><span>How much time do you have?</span>
+                                                <div class="arrow"></div>
+                                            </div>
+                                            <div class="custom-options"><span class="custom-option" data-value="60">Under 60 min</span><span class="custom-option" data-value="90">Under 90 min</span><span class="custom-option" data-value="120">Under 120 min</span><span class="custom-option" data-value="150">Under 150 min</span><span class="custom-option" data-value="180">Under 180 min</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-text">Select maximum movie length in minutes</div>
+                                </div>
+                            </div>
+                            <div class="alert alert-info d-flex align-items-start gap-3 mb-4" role="alert"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-lightbulb flex-shrink-0" viewBox="0 0 16 16">
+                                <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z" />
+                            </svg>
+                                <div><strong>Pro Tip:</strong> You can leave the filters blank as our algorithm will fetch the best movies for you!</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                            </svg>Get Recommendations</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <form action="/logout" method="post"><button type="submit" class="btn btn-link text-muted text-decoration-none"><small>Log Out</small></button></form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* --- General & Background --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top left, rgba(232, 237, 255, 0.8), transparent), radial-gradient(circle at bottom right, rgba(235, 222, 254, 0.8), transparent), #f4f7f6;
+            min-height: 100vh;
+        }
+
+    /* NEW: Apply Montserrat to all headings */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .card {
+            border-radius: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+
+        .welcome-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .main-form-card {
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .form-header-graphic {
+            height: 100px;
+            width: 100%;
+        }
+
+        .form-header-graphic svg {
+            width: 100%;
+            height: auto;
+        }
+
+    /* --- Form Step Styling --- */
+        .form-step-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #e0e5ff 0%, #d8d2ff 100%);
+            color: #667eea;
+            font-weight: 700;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-content {
+            width: 100%;
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+        }
+
+    /* --- Custom Select Dropdown Styling --- */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            user-select: none;
+        }
+
+        .custom-select {
+            position: relative;
+        }
+
+        .custom-select__trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.2rem;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+    /* This rule for Poiret One remains unchanged */
+        .custom-select__trigger span {
+            font-family: 'Poiret One', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .custom-select-wrapper:hover .custom-select__trigger {
+            border-color: #764ba2;
+        }
+
+        .custom-select.open .custom-select__trigger {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.15);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .arrow {
+            position: relative;
+            height: 10px;
+            width: 10px;
+        }
+
+        .arrow::before,
+        .arrow::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 0.15rem;
+            height: 100%;
+            background-color: #718096;
+            transition: all 0.2s ease;
+        }
+
+        .arrow::before {
+            left: -3px;
+            transform: rotate(-45deg);
+        }
+
+        .arrow::after {
+            right: 3px;
+            transform: rotate(45deg);
+        }
+
+        .custom-select.open .arrow::before {
+            transform: rotate(45deg);
+        }
+
+        .custom-select.open .arrow::after {
+            transform: rotate(-45deg);
+        }
+
+        .custom-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #764ba2;
+            border-top: 0;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+            max-height: 200px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .custom-select.open .custom-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+    /* General rule for options uses Poiret One */
+        .custom-option {
+            display: block;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Poiret One', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+    /* NEW: This more specific rule OVERRIDES the one above for the genre options only */
+        .genre-select-wrapper .custom-option {
+            font-family: 'Inter', sans-serif;
+        /* Use the clean sans-serif font */
+            font-size: 0.9rem;
+        /* Adjust size for a standard font */
+            font-weight: 400;
+        /* Use regular weight */
+        }
+
+        .custom-option:hover {
+            background-color: #f4f2ff;
+            color: #764ba2;
+        }
+
+        .custom-option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+    /* --- Buttons & Alerts --- */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: all 0.3s ease;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(118, 75, 162, 0.3), 0 4px 10px rgba(102, 126, 234, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(118, 75, 162, 0.5), 0 8px 16px rgba(102, 126, 234, 0.4);
+            }
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            animation-play-state: paused;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-outline-primary {
+            border-width: 2px;
+            border-color: #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            background-color: #667eea;
+            color: white;
+        }
+
+        .text-primary,
+        label svg {
+            color: #667eea !important;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border: 2px solid #bae6fd;
+            border-radius: 12px;
+            color: #0c4a6e;
+        }
+
+        .alert-info svg {
+            color: #0ea5e9;
+        }
+
+        .alert-info strong {
+            color: #075985;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const customSelects = document.querySelectorAll('.custom-select');
+            customSelects.forEach(select => {
+                const trigger = select.querySelector('.custom-select__trigger');
+                const options = select.querySelectorAll('.custom-option');
+                const hiddenInput = select.closest('.custom-select-wrapper').querySelector('input[type="hidden"]');
+                trigger.addEventListener('click', () => {
+                    select.classList.toggle('open');
+                });
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        trigger.querySelector('span').textContent = option.textContent;
+                        hiddenInput.value = option.getAttribute('data-value');
+                        select.classList.remove('open');
+                    });
+                });
+            });
+            window.addEventListener('click', function(e) {
+                document.querySelectorAll('.custom-select').forEach(select => {
+                    if (!select.contains(e.target)) {
+                        select.classList.remove('open');
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

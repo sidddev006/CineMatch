@@ -1,0 +1,490 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="background-shapes"></div>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="row justify-content-center align-items-center min-vh-100">
+                <div class="col-md-10 col-lg-8">
+                    <div class="dashboard-card">
+
+                        <div class="welcome-header">
+                            <div class="avatar-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
+                                </svg>
+                            </div>
+                            <h1 class="welcome-title">Welcome Back, <span class="username">{{ username }}</span>!</h1>
+                            <p class="welcome-subtitle">Ready to continue your movie journey?</p>
+                        </div>
+
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bookmark-star" viewBox="0 0 16 16">
+                                    <path d="M7.84 4.1a.178.178 0 0 1 .32 0l.634 1.285a.178.178 0 0 0 .134.098l1.42.206c.145.021.203.2.098.303L9.42 6.993a.178.178 0 0 0-.051.158l.242 1.414a.178.178 0 0 1-.258.187l-1.27-.668a.178.178 0 0 0-.165 0l-1.27.668a.178.178 0 0 1-.257-.187l.242-1.414a.178.178 0 0 0-.05-.158l-1.03-1.001a.178.178 0 0 1 .098-.303l1.42-.206a.178.178 0 0 0 .134-.098L7.84 4.1z" />
+                                    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z" />
+                                </svg>
+                                <div class="stat-info">
+                                    <div class="stat-label">Watchlist</div>
+                                    <div class="stat-value">Saved Movies</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-stars" viewBox="0 0 16 16">
+                                    <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z" />
+                                </svg>
+                                <div class="stat-info">
+                                    <div class="stat-label">Discover</div>
+                                    <div class="stat-value">New Movies</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"><span>What's Next?</span></div>
+
+                        <div class="action-cards">
+                            <a href="/recommend" class="action-card card-recommendations">
+                                <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16">
+                                    <path d="M9.5 2.672a.5.5 0 1 0 1 0V.843a.5.5 0 0 0-1 0v1.829Zm4.5.035A.5.5 0 0 0 13.293 2L12 3.293a.5.5 0 1 0 .707.707L14 2.707ZM7.293 4A.5.5 0 1 0 8 3.293L6.707 2A.5.5 0 0 0 6 2.707L7.293 4Zm-.621 2.5a.5.5 0 1 0 0-1H4.843a.5.5 0 1 0 0 1h1.829Zm8.485 0a.5.5 0 1 0 0-1h-1.829a.5.5 0 0 0 0 1h1.829ZM13.293 10A.5.5 0 1 0 14 9.293L12.707 8a.5.5 0 1 0-.707.707L13.293 10ZM9.5 11.157a.5.5 0 0 0 1 0V9.328a.5.5 0 0 0-1 0v1.829Zm1.854-5.097a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L8.646 5.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0l1.293-1.293Zm-3 3a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L.646 13.646a.5.5 0 0 0 0 .708l.708.707a.5.5 0 0 0 .707 0L8.354 9.06Z" />
+                                </svg></div>
+                                <div class="card-content">
+                                    <h3 class="card-title">Get Recommendations</h3>
+                                    <p class="card-description">Discover personalized movie picks based on your preferences</p>
+                                    <div class="card-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
+                                    </svg></div>
+                                </div>
+                            </a>
+                            <a href="/watchlist" class="action-card card-watchlist">
+                                <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark-heart-fill" viewBox="0 0 16 16">
+                                    <path d="M2 15.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v13.5zM8 4.41c1.387-1.425 4.854 1.07 0 4.277C3.146 5.48 6.613 2.986 8 4.412z" />
+                                </svg></div>
+                                <div class="card-content">
+                                    <h3 class="card-title">My Watchlist</h3>
+                                    <p class="card-description">View and manage your collection of saved movies</p>
+                                    <div class="card-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
+                                    </svg></div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="dashboard-footer">
+                            <form action="/logout" method="post" class="m-0"><button type="submit" class="btn-logout"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z" />
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" />
+                            </svg><span>Log Out</span></button></form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* --- NEW: Text Selection Disabler --- */
+    /* Use this class on elements where you want to prevent text highlighting */
+        .no-select {
+            -webkit-user-select: none;
+        /* Safari */
+            -moz-user-select: none;
+        /* Firefox */
+            -ms-user-select: none;
+        /* IE10+/Edge */
+            user-select: none;
+        /* Standard */
+        }
+
+        body {
+        /* NEW: Applying our font system */
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+        /* NEW: A solid, clean background color */
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+    /* NEW: Font rules for headings */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .stat-value {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+    /* --- NEW: Animated Background --- */
+        .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-shapes::before,
+        .background-shapes::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.2;
+            filter: blur(80px);
+        /* Creates the soft, ethereal look */
+        }
+
+        .background-shapes::before {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: moveShape1 20s infinite alternate ease-in-out;
+        }
+
+        .background-shapes::after {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: moveShape2 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes moveShape1 {
+            from {
+                transform: translate(10vw, 20vh) rotate(0deg);
+            }
+
+            to {
+                transform: translate(70vw, 60vh) rotate(180deg);
+            }
+        }
+
+        @keyframes moveShape2 {
+            from {
+                transform: translate(80vw, 10vh) rotate(0deg);
+            }
+
+            to {
+                transform: translate(20vw, 80vh) rotate(-180deg);
+            }
+        }
+
+    /* --- Dashboard Card (Glassmorphism Effect) --- */
+        .dashboard-card {
+        /* NEW: Applying the frosted glass effect */
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        /* For Safari */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+    /* ... (rest of the animations and header styles are the same) ... */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .avatar-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .avatar-circle svg {
+            color: white;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+        }
+
+        .username {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 0;
+        }
+
+    /* ... (stat cards, divider styles are the same) ... */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .stat-card svg {
+            color: #667eea;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            color: #2d3748;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+        }
+
+        .divider span {
+            position: relative;
+            display: inline-block;
+            padding: 0 1.5rem;
+            background: rgba(255, 255, 255, 0.6);
+            color: #a0aec0;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+    /* --- Action Cards with Enhanced Hover --- */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            padding: 2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            color: white;
+        }
+
+        .card-recommendations {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-watchlist {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+    /* NEW: Enhanced hover effect with background position animation */
+        .action-card {
+            background-size: 200% 200%;
+        /* Make background larger than the card */
+            animation: gradientShift 10s ease infinite;
+        }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+            animation-play-state: paused;
+        /* Pause the gentle shift on hover for a direct feel */
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+    /* ... (rest of the card styles are mostly the same) ... */
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .card-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover .card-arrow {
+            transform: translateX(8px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+    /* ... (footer and responsive styles are the same) ... */
+        .dashboard-footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #2d3748;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .welcome-title {
+                font-size: 1.75rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1rem;
+            }
+
+            .action-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
