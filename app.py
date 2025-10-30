@@ -12,6 +12,44 @@ from functools import wraps
 # This part is there to ensure that the user logins before directly accessing some routes
 # I copied this from problem set 9 Finance
 
+@app.route('/admin/viewdb')
+def view_database():
+    from cs50 import SQL
+    db = SQL("sqlite:///project.db")
+    
+    # Get all tables
+    tables = db.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    
+    html = "<h1>Database Contents</h1>"
+    
+    # Show data from each table
+    for table in tables:
+        table_name = table['name']
+        html += f"<h2>Table: {table_name}</h2>"
+        
+        try:
+            rows = db.execute(f"SELECT * FROM {table_name}")
+            html += "<table border='1' style='border-collapse: collapse;'>"
+            
+            if rows:
+                # Headers
+                html += "<tr>"
+                for key in rows[0].keys():
+                    html += f"<th style='padding: 10px;'>{key}</th>"
+                html += "</tr>"
+                
+                # Data
+                for row in rows:
+                    html += "<tr>"
+                    for value in row.values():
+                        html += f"<td style='padding: 10px;'>{value}</td>"
+                    html += "</tr>"
+            
+            html += "</table><br>"
+        except:
+            html += "<p>No data</p><br>"
+    
+    return html
 
 def login_required(f):
     """
