@@ -576,6 +576,8 @@ TV_GENRES = [
 GENRE_NAMES = {
     entry["id"]: entry["name"] for entry in MOVIE_GENRES + TV_GENRES
 }
+ALL_GENRES = MOVIE_GENRES + [entry for entry in TV_GENRES
+                             if entry["id"] not in {item["id"] for item in MOVIE_GENRES}]
 
 def _haunted_discover(media_type, genre_ids, page, recommendation=False):
     """Fetch one page from TMDB, with bounded timeouts and safe fallbacks."""
@@ -616,7 +618,7 @@ def _haunted_genre_ids(media_type, selected):
         allowed = {entry["id"] for entry in TV_GENRES}
         # TMDB has no TV Horror genre. Mystery and Sci-Fi & Fantasy are the
         # closest TV catalog categories for supernatural and horror series.
-        remap = {27: 9648, 14: 10765, 878: 10765, 53: 9648, 10749: 18}
+        remap = {28: 10759, 12: 10759, 27: 9648, 14: 10765, 878: 10765, 53: 9648, 10749: 18, 10752: 10768}
         return list(dict.fromkeys(remap.get(int(value), int(value)) for value in selected
                                   if remap.get(int(value), int(value)) in allowed))
     allowed = {entry["id"] for entry in MOVIE_GENRES}
@@ -633,7 +635,7 @@ def haunted_recommender():
     """Three-step, session-scoped recommender for films, series, or both."""
     if request.method == "GET":
         session.pop("haunted_recommender", None)
-        return render_template("haunted.html", stage="preferences", genres=MOVIE_GENRES)
+        return render_template("haunted.html", stage="preferences", genres=ALL_GENRES)
 
     stage = request.form.get("stage")
     if stage == "survey":
@@ -662,7 +664,7 @@ def haunted_recommender():
         )[:16]
         if len(titles) < 8:
             flash("TMDB returned too few titles just now. Please try again.")
-            return render_template("haunted.html", stage="preferences", genres=MOVIE_GENRES)
+            return render_template("haunted.html", stage="preferences", genres=ALL_GENRES)
         session["haunted_recommender"] = {
             "media_type": media_type,
             "genres": selected_genres,
@@ -714,9 +716,15 @@ def haunted_recommender():
                     genre_ids = item.get("genre_ids", [])
                     if genre_affinity and genre_ids:
                         mapped_affinity = []
+                        tv_equivalents = {
+                            10759: (28, 12), 10765: (14, 878),
+                            9648: (27, 53), 18: (10749,), 10768: (10752,)
+                        }
                         for genre_id in genre_ids:
-                            if kind == "tv" and genre_id == 10765:
-                                mapped_affinity.extend(genre_affinity.get(g, 0) for g in (14, 878))
+                            if kind == "tv" and genre_id in tv_equivalents:
+                                mapped_affinity.extend(
+                                    genre_affinity.get(g, 0) for g in tv_equivalents[genre_id]
+                                )
                             else:
                                 mapped_affinity.append(genre_affinity.get(genre_id, 0))
                         taste = sum(mapped_affinity) / max(len(mapped_affinity), 1)
