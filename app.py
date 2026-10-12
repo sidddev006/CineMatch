@@ -545,3 +545,240 @@ def logout():
     """
     session.clear()  # Remove all session data including user_id
     return redirect("/")
+
+
+# ============================================================================
+# PERSONALIZED MOVIE & SERIES RECOMMENDER
+# ============================================================================
+# This flow is separate from the original weighted-rating discovery route.
+# It uses TMDB discovery results, genre affinity, and a user's 1-10 ratings.
+MOVIE_GENRES = [
+    {"id": 28, "name": "Action"}, {"id": 12, "name": "Adventure"},
+    {"id": 16, "name": "Animation"}, {"id": 35, "name": "Comedy"},
+    {"id": 80, "name": "Crime"}, {"id": 99, "name": "Documentary"},
+    {"id": 18, "name": "Drama"}, {"id": 10751, "name": "Family"},
+    {"id": 14, "name": "Fantasy"}, {"id": 36, "name": "History"},
+    {"id": 27, "name": "Horror"}, {"id": 10402, "name": "Music"},
+    {"id": 9648, "name": "Mystery"}, {"id": 10749, "name": "Romance"},
+    {"id": 878, "name": "Science Fiction"}, {"id": 53, "name": "Thriller"},
+    {"id": 10752, "name": "War"}, {"id": 37, "name": "Western"}
+]
+TV_GENRES = [
+    {"id": 10759, "name": "Action & Adventure"}, {"id": 16, "name": "Animation"},
+    {"id": 35, "name": "Comedy"}, {"id": 80, "name": "Crime"},
+    {"id": 99, "name": "Documentary"}, {"id": 18, "name": "Drama"},
+    {"id": 10751, "name": "Family"}, {"id": 10762, "name": "Kids"},
+    {"id": 9648, "name": "Mystery"}, {"id": 10763, "name": "News"},
+    {"id": 10764, "name": "Reality"}, {"id": 10765, "name": "Sci-Fi & Fantasy"},
+    {"id": 10766, "name": "Soap"}, {"id": 10767, "name": "Talk"},
+    {"id": 10768, "name": "War & Politics"}, {"id": 37, "name": "Western"}
+]
+GENRE_NAMES = {
+    entry["id"]: entry["name"] for entry in MOVIE_GENRES + TV_GENRES
+}
+ALL_GENRES = MOVIE_GENRES + [entry for entry in TV_GENRES
+                             if entry["id"] not in {item["id"] for item in MOVIE_GENRES}]
+
+def _haunted_discover(media_type, genre_ids, page, recommendation=False):
+    """Fetch one page from TMDB, with bounded timeouts and safe fallbacks."""
+    endpoint = "tv" if media_type == "tv" else "movie"
+    params = {
+        "api_key": TMDB_API_KEY,
+        "language": "en-US",
+        "sort_by": "vote_average.desc",
+        "include_adult": "false",
+        "page": page,
+        "vote_count.gte": 20 if recommendation else 5
+    }
+    if genre_ids:
+        params["with_genres"] = "|".join(str(value) for value in genre_ids)
+    try:
+        response = requests.get(
+            "https://api.themoviedb.org/3/discover/" + endpoint,
+            params=params,
+            timeout=12
+        )
+        response.raise_for_status()
+        payload = response.json()
+        titles = []
+        for result in payload.get("results", []):
+            item = dict(result)
+            item["media_type"] = media_type
+            item["title"] = item.get("name" if media_type == "tv" else "title", "Untitled")
+            item["release_date"] = item.get("first_air_date" if media_type == "tv" else "release_date", "")
+            item["genre_ids"] = item.get("genre_ids", [])
+            if item.get("title"):
+                titles.append(item)
+        return titles
+    except (requests.RequestException, ValueError):
+        return []
+
+def _haunted_genre_ids(media_type, selected):
+    if media_type == "tv":
+        allowed = {entry["id"] for entry in TV_GENRES}
+        # TMDB has no TV Horror genre. Mystery and Sci-Fi & Fantasy are the
+        # closest TV catalog categories for supernatural and horror series.
+        remap = {28: 10759, 12: 10759, 27: 9648, 14: 10765, 878: 10765, 53: 9648, 10749: 18, 10752: 10768}
+        return list(dict.fromkeys(remap.get(int(value), int(value)) for value in selected
+                                  if remap.get(int(value), int(value)) in allowed))
+    allowed = {entry["id"] for entry in MOVIE_GENRES}
+    return list(dict.fromkeys(int(value) for value in selected if int(value) in allowed))
+
+def _haunted_title_quality(item):
+    votes = max(int(item.get("vote_count") or 0), 0)
+    rating = float(item.get("vote_average") or 0)
+    return ((votes / (votes + 350)) * rating + (350 / (votes + 350)) * 6.8) / 10
+
+@app.route("/haunted", methods=["GET", "POST"])
+@login_required
+def haunted_recommender():
+    """Three-step, session-scoped recommender for films, series, or both."""
+    if request.method == "GET":
+        session.pop("haunted_recommender", None)
+        return render_template("haunted.html", stage="preferences", genres=ALL_GENRES)
+
+    stage = request.form.get("stage")
+    if stage == "survey":
+        media_type = request.form.get("media_type", "both")
+        if media_type not in {"movie", "tv", "both"}:
+            media_type = "both"
+        selected_genres = request.form.getlist("genres")
+        genres_by_type = {
+            "movie": _haunted_genre_ids("movie", selected_genres),
+            "tv": _haunted_genre_ids("tv", selected_genres)
+        }
+        types = ["movie", "tv"] if media_type == "both" else [media_type]
+        titles = []
+        for kind in types:
+            genres_for_kind = genres_by_type[kind]
+            for page in (1, 2):
+                titles.extend(_haunted_discover(kind, genres_for_kind, page))
+        # Interleave formats and genres so the taste check is not just one long block.
+        deduped = {}
+        for item in titles:
+            deduped[(item["media_type"], item["id"])] = item
+        ranked_titles = sorted(
+            deduped.values(),
+            key=lambda item: (item.get("vote_count", 0), item.get("vote_average", 0)),
+            reverse=True
+        )
+        if media_type == "both":
+            by_kind = {
+                kind: [item for item in ranked_titles if item["media_type"] == kind]
+                for kind in ("movie", "tv")
+            }
+            titles = []
+            for index in range(max(len(by_kind["movie"]), len(by_kind["tv"]))):
+                for kind in ("movie", "tv"):
+                    if index < len(by_kind[kind]):
+                        titles.append(by_kind[kind][index])
+            titles = titles[:16]
+        else:
+            titles = ranked_titles[:16]
+        if len(titles) < 8:
+            flash("TMDB returned too few titles just now. Please try again.")
+            return render_template("haunted.html", stage="preferences", genres=ALL_GENRES)
+        session["haunted_recommender"] = {
+            "media_type": media_type,
+            "genres": selected_genres,
+            "titles": titles
+        }
+        return render_template("haunted.html", stage="survey", titles=titles)
+
+    if stage == "results":
+        state = session.get("haunted_recommender")
+        if not state:
+            flash("Please start a new recommendation round.")
+            return redirect("/haunted")
+        watched = set()
+        ratings = {}
+        for item in state["titles"]:
+            key = item["media_type"] + "_" + str(item["id"])
+            if request.form.get("status_" + key) == "watched":
+                watched.add((item["media_type"], int(item["id"])))
+                try:
+                    ratings[key] = max(1, min(10, int(request.form.get("rating_" + key, 7))))
+                except (TypeError, ValueError):
+                    ratings[key] = 7
+
+        # Begin with explicit genre choices, then learn from each watched title.
+        genre_affinity = {}
+        selected = {int(value) for value in state["genres"]}
+        for genre_id in selected:
+            genre_affinity[genre_id] = 1.0
+        for item in state["titles"]:
+            key = item["media_type"] + "_" + str(item["id"])
+            if key not in ratings:
+                continue
+            # Ratings above/below 6 raise/lower the item's genre preference.
+            preference = (ratings[key] - 5.5) / 4.5
+            for genre_id in item.get("genre_ids", []):
+                genre_affinity[genre_id] = max(-1.0, min(1.5,
+                    genre_affinity.get(genre_id, 0.0) + preference * 0.65))
+
+        media_types = ["movie", "tv"] if state["media_type"] == "both" else [state["media_type"]]
+        picks = []
+        for kind in media_types:
+            # Expand the search with genres that received strong ratings, so a
+            # high score in the taste check can broaden the initial genre choices.
+            positive_genres = [
+                str(genre_id) for genre_id, weight in genre_affinity.items()
+                if weight > 0.2
+            ]
+            search_genres = list(dict.fromkeys(state["genres"] + positive_genres))
+            genres_for_kind = _haunted_genre_ids(kind, search_genres)
+            # If the user supplied no genres, request a broad quality-ranked catalog.
+            for page in (1, 2, 3):
+                for item in _haunted_discover(kind, genres_for_kind, page, recommendation=True):
+                    item_key = (kind, int(item["id"]))
+                    if item_key in watched:
+                        continue
+                    genre_ids = item.get("genre_ids", [])
+                    if genre_affinity and genre_ids:
+                        mapped_affinity = []
+                        tv_equivalents = {
+                            10759: (28, 12), 10765: (14, 878),
+                            9648: (27, 53), 18: (10749,), 10768: (10752,)
+                        }
+                        for genre_id in genre_ids:
+                            if kind == "tv" and genre_id in tv_equivalents:
+                                mapped_affinity.extend(
+                                    genre_affinity.get(g, 0) for g in tv_equivalents[genre_id]
+                                )
+                            else:
+                                mapped_affinity.append(genre_affinity.get(genre_id, 0))
+                        taste = sum(mapped_affinity) / max(len(mapped_affinity), 1)
+                    else:
+                        taste = 0.2
+                    # Blend personal genre affinity with a Bayesian quality score.
+                    score = 0.72 * _haunted_title_quality(item) + 0.28 * max(0, min(1, (taste + 1) / 2))
+                    item["match"] = round(score * 100)
+                    item["year"] = (item.get("release_date") or "")[:4]
+                    item["genre_names"] = [GENRE_NAMES.get(g, "Genre") for g in genre_ids]
+                    picks.append(item)
+
+        picks.sort(key=lambda item: (item["match"], item.get("vote_count", 0)), reverse=True)
+        unique = {}
+        for item in picks:
+            unique[(item["media_type"], item["id"])] = item
+        ranked_picks = sorted(
+            unique.values(),
+            key=lambda item: (item["match"], item.get("vote_count", 0)),
+            reverse=True
+        )
+        if state["media_type"] == "both":
+            by_kind = {
+                kind: [item for item in ranked_picks if item["media_type"] == kind]
+                for kind in ("movie", "tv")
+            }
+            picks = []
+            for index in range(max(len(by_kind["movie"]), len(by_kind["tv"]))):
+                for kind in ("movie", "tv"):
+                    if index < len(by_kind[kind]):
+                        picks.append(by_kind[kind][index])
+            picks = picks[:5]
+        else:
+            picks = ranked_picks[:5]
+        return render_template("haunted.html", stage="results", picks=picks)
+
+    return redirect("/haunted")
