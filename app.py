@@ -657,11 +657,24 @@ def haunted_recommender():
         deduped = {}
         for item in titles:
             deduped[(item["media_type"], item["id"])] = item
-        titles = sorted(
+        ranked_titles = sorted(
             deduped.values(),
             key=lambda item: (item.get("vote_count", 0), item.get("vote_average", 0)),
             reverse=True
-        )[:16]
+        )
+        if media_type == "both":
+            by_kind = {
+                kind: [item for item in ranked_titles if item["media_type"] == kind]
+                for kind in ("movie", "tv")
+            }
+            titles = []
+            for index in range(max(len(by_kind["movie"]), len(by_kind["tv"]))):
+                for kind in ("movie", "tv"):
+                    if index < len(by_kind[kind]):
+                        titles.append(by_kind[kind][index])
+            titles = titles[:16]
+        else:
+            titles = ranked_titles[:16]
         if len(titles) < 8:
             flash("TMDB returned too few titles just now. Please try again.")
             return render_template("haunted.html", stage="preferences", genres=ALL_GENRES)
@@ -706,7 +719,14 @@ def haunted_recommender():
         media_types = ["movie", "tv"] if state["media_type"] == "both" else [state["media_type"]]
         picks = []
         for kind in media_types:
-            genres_for_kind = _haunted_genre_ids(kind, state["genres"])
+            # Expand the search with genres that received strong ratings, so a
+            # high score in the taste check can broaden the initial genre choices.
+            positive_genres = [
+                str(genre_id) for genre_id, weight in genre_affinity.items()
+                if weight > 0.2
+            ]
+            search_genres = list(dict.fromkeys(state["genres"] + positive_genres))
+            genres_for_kind = _haunted_genre_ids(kind, search_genres)
             # If the user supplied no genres, request a broad quality-ranked catalog.
             for page in (1, 2, 3):
                 for item in _haunted_discover(kind, genres_for_kind, page, recommendation=True):
@@ -741,7 +761,24 @@ def haunted_recommender():
         unique = {}
         for item in picks:
             unique[(item["media_type"], item["id"])] = item
-        picks = list(unique.values())[:5]
+        ranked_picks = sorted(
+            unique.values(),
+            key=lambda item: (item["match"], item.get("vote_count", 0)),
+            reverse=True
+        )
+        if state["media_type"] == "both":
+            by_kind = {
+                kind: [item for item in ranked_picks if item["media_type"] == kind]
+                for kind in ("movie", "tv")
+            }
+            picks = []
+            for index in range(max(len(by_kind["movie"]), len(by_kind["tv"]))):
+                for kind in ("movie", "tv"):
+                    if index < len(by_kind[kind]):
+                        picks.append(by_kind[kind][index])
+            picks = picks[:5]
+        else:
+            picks = ranked_picks[:5]
         return render_template("haunted.html", stage="results", picks=picks)
 
     return redirect("/haunted")
