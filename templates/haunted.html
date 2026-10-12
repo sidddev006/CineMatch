@@ -51,8 +51,8 @@
         <div class="title-info"><h3>{{ title.title }}</h3><p>{{ (title.release_date or "")[:4] }}{% if title.vote_average %} <span>·</span> ★ {{ "%.1f"|format(title.vote_average) }}{% endif %}</p></div>
         <fieldset class="watched-options">
           <legend>Have you watched it?</legend>
-          <label><input type="radio" name="status_{{ title.media_type }}_{{ title.id }}" value="watched" required><span>Watched</span></label>
-          <label><input type="radio" name="status_{{ title.media_type }}_{{ title.id }}" value="unwatched"><span>Not yet</span></label>
+          <label><input type="radio" name="status_{{ title.media_type }}_{{ title.id }}" value="watched" required><span>I have watched it</span></label>
+          <label><input type="radio" name="status_{{ title.media_type }}_{{ title.id }}" value="unwatched"><span>I have not watched it</span></label>
         </fieldset>
         <div class="rating-box" id="rating-box-{{ title.media_type }}-{{ title.id }}" hidden>
           <label for="rating-{{ title.media_type }}-{{ title.id }}">How well did you like it?</label>
